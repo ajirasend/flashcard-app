@@ -2,25 +2,36 @@ package com.bagas.flashcards;
 
 import com.bagas.flashcards.model.Card;
 import com.bagas.flashcards.model.Deck;
-import com.bagas.flashcards.view.QuizPanel;
+import com.bagas.flashcards.storage.DeckRepository;
+import com.bagas.flashcards.view.MainFrame;
 
-import javax.swing.JFrame;
+import java.io.IOException;
+import java.nio.file.Path;
+
 import javax.swing.SwingUtilities;
 
 public class Main {
     public static void main(String[] args) {
+        // Decks live in the user's home folder, outside the project, so they never end up in git
+        Path decksFolder = Path.of(System.getProperty("user.home"), ".flashcard-app", "decks");
+        DeckRepository repository = new DeckRepository(decksFolder);
+        seedSampleDeckIfEmpty(repository);
+
         // Swing UI must be created on the Event Dispatch Thread
-        SwingUtilities.invokeLater(() -> {
-            JFrame frame = new JFrame("Flashcard App");
-            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            frame.setSize(600, 400);
-            frame.setLocationRelativeTo(null);
-            frame.add(new QuizPanel(sampleDeck()));
-            frame.setVisible(true);
-        });
+        SwingUtilities.invokeLater(() -> new MainFrame(repository).setVisible(true));
     }
 
-    // Temporary: replaced by loading real decks once the deck list screen exists
+    /** On first run, gives the user one deck to try out. */
+    private static void seedSampleDeckIfEmpty(DeckRepository repository) {
+        try {
+            if (repository.loadAll().isEmpty()) {
+                repository.save(sampleDeck());
+            }
+        } catch (IOException e) {
+            System.err.println("Could not create sample deck: " + e.getMessage());
+        }
+    }
+
     private static Deck sampleDeck() {
         Deck deck = new Deck("Java Basics");
         deck.addCard(new Card("What does JVM stand for?", "Java Virtual Machine"));

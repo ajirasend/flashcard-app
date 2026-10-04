@@ -13,6 +13,7 @@ import java.awt.Font;
 import java.util.Random;
 
 import javax.swing.BorderFactory;
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -28,6 +29,7 @@ public class QuizPanel extends JPanel {
     private static final String RESULT_VIEW = "result";
 
     private final Deck deck;
+    private final Runnable onExit;
     private QuizSession session;
     private boolean showingAnswer;
 
@@ -40,8 +42,12 @@ public class QuizPanel extends JPanel {
     private final JButton missedButton = new JButton("I didn't");
     private final JLabel scoreLabel = new JLabel("", SwingConstants.CENTER);
 
-    public QuizPanel(Deck deck) {
+    /**
+     * @param onExit called when the user leaves the quiz (e.g. to go back to the deck list)
+     */
+    public QuizPanel(Deck deck, Runnable onExit) {
         this.deck = deck;
+        this.onExit = onExit;
         setLayout(views);
         add(buildQuizView(), QUIZ_VIEW);
         add(buildResultView(), RESULT_VIEW);
@@ -52,8 +58,13 @@ public class QuizPanel extends JPanel {
         JPanel panel = new JPanel(new BorderLayout(10, 10));
         panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
+        JPanel header = new JPanel(new BorderLayout());
+        JButton backButton = new JButton("< Back");
+        backButton.addActionListener(e -> onExit.run());
         progressLabel.setFont(progressLabel.getFont().deriveFont(Font.PLAIN, 14f));
-        panel.add(progressLabel, BorderLayout.NORTH);
+        header.add(backButton, BorderLayout.WEST);
+        header.add(progressLabel, BorderLayout.CENTER);
+        panel.add(header, BorderLayout.NORTH);
 
         JPanel cardPanel = new JPanel(new BorderLayout());
         cardPanel.setBorder(BorderFactory.createLineBorder(Color.GRAY, 2, true));
@@ -92,11 +103,17 @@ public class QuizPanel extends JPanel {
         again.setAlignmentX(Component.CENTER_ALIGNMENT);
         again.addActionListener(e -> startQuiz());
 
+        JButton back = new JButton("Back to decks");
+        back.setAlignmentX(Component.CENTER_ALIGNMENT);
+        back.addActionListener(e -> onExit.run());
+
         panel.add(title);
-        panel.add(javax.swing.Box.createVerticalStrut(20));
+        panel.add(Box.createVerticalStrut(20));
         panel.add(scoreLabel);
-        panel.add(javax.swing.Box.createVerticalStrut(30));
+        panel.add(Box.createVerticalStrut(30));
         panel.add(again);
+        panel.add(Box.createVerticalStrut(10));
+        panel.add(back);
         return panel;
     }
 
