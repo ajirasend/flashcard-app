@@ -32,4 +32,5 @@ src/main/java/com/bagas/flashcards/
 ```
 
 ## Screenshots
-_Coming soon_
+<img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/73613872-246a-4be3-93ae-0236206c1580" />
+<img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/d544a660-cb01-4c12-9e73-11f3b11a8e2b" />
