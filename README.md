@@ -44,5 +44,7 @@ src/main/java/com/bagas/flashcards/
 ```
 
 ## Screenshots
-<img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/73613872-246a-4be3-93ae-0236206c1580" />
-<img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/d544a660-cb01-4c12-9e73-11f3b11a8e2b" />
+<img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/3625c3f5-3fc3-4395-9cdf-55ab209f6a56" />
+<img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/08ebe9e6-7ef4-49ac-9e66-d55ee3f374f9" />
+<img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/49cc4568-5c50-45a1-b1ad-45c4cbd1e906" />
+<img width="1919" height="1079" alt="image" src="https://github.com/user-attachments/assets/927339df-475d-4f20-85de-2edcfc74dd25" />
