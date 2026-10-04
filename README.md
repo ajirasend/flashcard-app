@@ -1,19 +1,15 @@
 # Flashcard App
 
 A desktop flashcard quiz app built with pure Java (Swing). Create decks, flip cards, and track your quiz score.
-
-> Work in progress
-
 ## Features
-- [x] Create, edit and delete decks and cards
+- [x] Create, edit, and delete decks and cards
 - [x] Flip cards and self-grade ("I knew it" / "I didn't")
-- [x] Score summary at the end of a quiz
-- [x] Decks saved automatically to `~/.flashcard-app/decks`
-- [x] Cards are shuffled each quiz
-- [x] Keyboard shortcuts
-- [x] Modern look with [FlatLaf](https://www.formdev.com/flatlaf/)
+- [x] Automatic session scoring and shuffle
+- [x] Persistent storage saving decks automatically to `~/.flashcard-app/decks`
+- [x] Full keyboard navigation
+- [x] Modern, responsive look with [FlatLaf](https://www.formdev.com/flatlaf/)
 
-## Keyboard shortcuts (quiz)
+## Keyboard Shortcuts (Quiz)
 | Key | Action |
 |-----|--------|
 | `Space` | Flip the card |
@@ -21,11 +17,17 @@ A desktop flashcard quiz app built with pure Java (Swing). Create decks, flip ca
 | `←` | I didn't |
 | `Esc` | Back to the deck list |
 
-## Requirements
-- Java 25 (JDK)
-- Maven 3.9+
+## Quick Start (Pre-built)
+If you just want to run the app without building from source:
+1. Download `flashcard-app-0.1.0-SNAPSHOT.jar` from the **[Releases](https://github.com/ajirasend/flashcard-app/releases)** page.
+2. Run it with:
+```bash
+java -jar flashcard-app-0.1.0-SNAPSHOT.jar
+```
+*(Or simply double-click the `.jar` file if Java is installed).*
 
-## Build and run
+## Build from Source
+If you want to view, build, or run the test suite yourself:
 ```bash
 git clone https://github.com/ajirasend/flashcard-app.git
 cd flashcard-app
