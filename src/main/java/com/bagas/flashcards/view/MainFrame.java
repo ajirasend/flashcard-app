@@ -4,6 +4,7 @@ import com.bagas.flashcards.model.Deck;
 import com.bagas.flashcards.storage.DeckRepository;
 
 import java.awt.CardLayout;
+import java.awt.Dimension;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -26,7 +27,8 @@ public class MainFrame extends JFrame implements Navigator {
         this.repository = repository;
 
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setSize(700, 480);
+        setSize(880, 580);
+        setMinimumSize(new Dimension(680, 460));
         setLocationRelativeTo(null);
 
         listPanel = new DeckListPanel(repository, this);

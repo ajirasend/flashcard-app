@@ -23,6 +23,8 @@ import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 
+import java.awt.Insets;
+
 /** Home screen: lists saved decks and lets the user study, edit, create or delete them. */
 public class DeckListPanel extends JPanel {
     private final DeckRepository repository;
@@ -34,15 +36,18 @@ public class DeckListPanel extends JPanel {
         this.repository = repository;
         this.navigator = navigator;
 
-        setLayout(new BorderLayout(10, 10));
-        setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        setLayout(new BorderLayout());
+
+        JPanel content = new JPanel(new BorderLayout(0, 16));
+        content.setBorder(BorderFactory.createEmptyBorder(24, 20, 24, 20));
 
         JLabel title = new JLabel("My Decks", SwingConstants.CENTER);
-        title.setFont(title.getFont().deriveFont(Font.BOLD, 24f));
-        add(title, BorderLayout.NORTH);
+        title.setFont(title.getFont().deriveFont(Font.BOLD, 26f));
+        content.add(title, BorderLayout.NORTH);
 
         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         list.setFont(list.getFont().deriveFont(Font.PLAIN, 16f));
+        list.setFixedCellHeight(44);
         list.setCellRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList<?> l, Object value, int index,
@@ -51,7 +56,7 @@ public class DeckListPanel extends JPanel {
                 Deck deck = (Deck) value;
                 label.putClientProperty("html.disable", Boolean.TRUE); // show user text literally
                 label.setText(deck.getName() + "  (" + deck.size() + (deck.size() == 1 ? " card)" : " cards)"));
-                label.setBorder(BorderFactory.createEmptyBorder(6, 8, 6, 8));
+                label.setBorder(BorderFactory.createEmptyBorder(6, 12, 6, 12));
                 return label;
             }
         });
@@ -63,7 +68,7 @@ public class DeckListPanel extends JPanel {
                 }
             }
         });
-        add(new JScrollPane(list), BorderLayout.CENTER);
+        content.add(new JScrollPane(list), BorderLayout.CENTER);
 
         JButton studyButton = new JButton("Study");
         JButton editButton = new JButton("Edit cards");
@@ -74,12 +79,15 @@ public class DeckListPanel extends JPanel {
         newButton.addActionListener(e -> createDeck());
         deleteButton.addActionListener(e -> deleteSelected());
 
-        JPanel buttons = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 0));
-        buttons.add(studyButton);
-        buttons.add(editButton);
-        buttons.add(newButton);
-        buttons.add(deleteButton);
-        add(buttons, BorderLayout.SOUTH);
+        JPanel buttons = new JPanel(new FlowLayout(FlowLayout.CENTER, 12, 0));
+        for (JButton b : new JButton[] {studyButton, editButton, newButton, deleteButton}) {
+            b.setFont(b.getFont().deriveFont(Font.PLAIN, 15f));
+            b.setMargin(new Insets(8, 16, 8, 16));
+            buttons.add(b);
+        }
+        content.add(buttons, BorderLayout.SOUTH);
+
+        add(new MaxWidthPanel(content, 750), BorderLayout.CENTER);
     }
 
     /** Reloads the deck list from disk. */

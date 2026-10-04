@@ -6,10 +6,11 @@ import com.bagas.flashcards.model.QuizSession;
 
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.util.Random;
 
@@ -38,8 +39,7 @@ public class QuizPanel extends JPanel {
 
     private final CardLayout views = new CardLayout();
     private final JLabel progressLabel = new JLabel("", SwingConstants.CENTER);
-    private final JLabel sideLabel = new JLabel("", SwingConstants.CENTER);
-    private final JLabel cardText = new JLabel("", SwingConstants.CENTER);
+    private final FlashCardView cardView = new FlashCardView();
     private final JButton flipButton = new JButton("Flip (Space)");
     private final JButton knewButton = new JButton("I knew it (\u2192)");
     private final JButton missedButton = new JButton("I didn't (\u2190)");
@@ -99,30 +99,27 @@ public class QuizPanel extends JPanel {
     }
 
     private JPanel buildQuizView() {
-        JPanel panel = new JPanel(new BorderLayout(10, 10));
-        panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        JPanel panel = new JPanel(new BorderLayout(0, 16));
+        panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 24, 20));
 
         JPanel header = new JPanel(new BorderLayout());
         JButton backButton = new JButton("< Back");
         backButton.addActionListener(e -> onExit.run());
-        progressLabel.setFont(progressLabel.getFont().deriveFont(Font.PLAIN, 14f));
+        progressLabel.setFont(progressLabel.getFont().deriveFont(Font.PLAIN, 15f));
         header.add(backButton, BorderLayout.WEST);
         header.add(progressLabel, BorderLayout.CENTER);
+        // Invisible twin of the back button keeps the progress label truly centered
+        header.add(Box.createHorizontalStrut(backButton.getPreferredSize().width), BorderLayout.EAST);
         panel.add(header, BorderLayout.NORTH);
 
-        JPanel cardPanel = new JPanel(new BorderLayout());
-        cardPanel.setBorder(BorderFactory.createLineBorder(Color.GRAY, 2, true));
-        sideLabel.setFont(sideLabel.getFont().deriveFont(Font.BOLD, 12f));
-        sideLabel.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 0));
-        cardText.setFont(cardText.getFont().deriveFont(Font.PLAIN, 22f));
-        cardPanel.add(sideLabel, BorderLayout.NORTH);
-        cardPanel.add(cardText, BorderLayout.CENTER);
-        panel.add(cardPanel, BorderLayout.CENTER);
+        panel.add(cardView, BorderLayout.CENTER);
 
-        JPanel buttons = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 0));
-        buttons.add(flipButton);
-        buttons.add(missedButton);
-        buttons.add(knewButton);
+        JPanel buttons = new JPanel(new FlowLayout(FlowLayout.CENTER, 12, 0));
+        for (JButton button : new JButton[] {missedButton, flipButton, knewButton}) {
+            button.setFont(button.getFont().deriveFont(Font.PLAIN, 16f));
+            button.setMargin(new Insets(10, 22, 10, 22));
+            buttons.add(button);
+        }
         panel.add(buttons, BorderLayout.SOUTH);
 
         flipButton.addActionListener(e -> flip());
@@ -132,32 +129,37 @@ public class QuizPanel extends JPanel {
     }
 
     private JPanel buildResultView() {
-        JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        panel.setBorder(BorderFactory.createEmptyBorder(60, 20, 20, 20));
+        JPanel content = new JPanel();
+        content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
 
         JLabel title = new JLabel("Quiz finished!", SwingConstants.CENTER);
-        title.setFont(title.getFont().deriveFont(Font.BOLD, 26f));
+        title.setFont(title.getFont().deriveFont(Font.BOLD, 30f));
         title.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        scoreLabel.setFont(scoreLabel.getFont().deriveFont(Font.PLAIN, 20f));
+        scoreLabel.setFont(scoreLabel.getFont().deriveFont(Font.PLAIN, 22f));
         scoreLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         JButton again = new JButton("Try again");
-        again.setAlignmentX(Component.CENTER_ALIGNMENT);
-        again.addActionListener(e -> startQuiz());
-
         JButton back = new JButton("Back to decks");
-        back.setAlignmentX(Component.CENTER_ALIGNMENT);
+        again.addActionListener(e -> startQuiz());
         back.addActionListener(e -> onExit.run());
+        for (JButton button : new JButton[] {again, back}) {
+            button.setFont(button.getFont().deriveFont(Font.PLAIN, 16f));
+            button.setMargin(new Insets(10, 22, 10, 22));
+            button.setAlignmentX(Component.CENTER_ALIGNMENT);
+        }
 
-        panel.add(title);
-        panel.add(Box.createVerticalStrut(20));
-        panel.add(scoreLabel);
-        panel.add(Box.createVerticalStrut(30));
-        panel.add(again);
-        panel.add(Box.createVerticalStrut(10));
-        panel.add(back);
+        content.add(title);
+        content.add(Box.createVerticalStrut(16));
+        content.add(scoreLabel);
+        content.add(Box.createVerticalStrut(32));
+        content.add(again);
+        content.add(Box.createVerticalStrut(10));
+        content.add(back);
+
+        // GridBagLayout with default constraints centers its child both ways
+        JPanel panel = new JPanel(new GridBagLayout());
+        panel.add(content);
         return panel;
     }
 
@@ -171,8 +173,7 @@ public class QuizPanel extends JPanel {
         Card card = session.getCurrentCard();
         showingAnswer = false;
         progressLabel.setText("Card " + session.getCurrentNumber() + " of " + session.getTotal());
-        sideLabel.setText("QUESTION");
-        cardText.setText(wrap(card.getQuestion()));
+        cardView.showSide(false, card.getQuestion());
         flipButton.setEnabled(true);
         knewButton.setEnabled(false);
         missedButton.setEnabled(false);
@@ -181,8 +182,7 @@ public class QuizPanel extends JPanel {
     private void flip() {
         Card card = session.getCurrentCard();
         showingAnswer = !showingAnswer;
-        sideLabel.setText(showingAnswer ? "ANSWER" : "QUESTION");
-        cardText.setText(wrap(showingAnswer ? card.getAnswer() : card.getQuestion()));
+        cardView.showSide(showingAnswer, showingAnswer ? card.getAnswer() : card.getQuestion());
         // Only allow grading once the answer has been seen
         knewButton.setEnabled(showingAnswer);
         missedButton.setEnabled(showingAnswer);
@@ -196,12 +196,5 @@ public class QuizPanel extends JPanel {
         } else {
             showQuestion();
         }
-    }
-
-    /** JLabel needs HTML to wrap long text; escape so user text can't inject markup. */
-    private static String wrap(String text) {
-        String safe = text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
-                .replace("\n", "<br>");
-        return "<html><div style='text-align:center;width:400px'>" + safe + "</div></html>";
     }
 }

@@ -8,10 +8,13 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.GridLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.io.IOException;
 
 import javax.swing.BorderFactory;
+import javax.swing.Box;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -38,12 +41,16 @@ public class EditorPanel extends JPanel {
         this.deck = deck;
         this.repository = repository;
 
-        setLayout(new BorderLayout(10, 10));
-        setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        setLayout(new BorderLayout());
 
-        add(buildHeader(navigator), BorderLayout.NORTH);
+        JPanel content = new JPanel(new BorderLayout(0, 16));
+        content.setBorder(BorderFactory.createEmptyBorder(24, 20, 24, 20));
+
+        content.add(buildHeader(navigator), BorderLayout.NORTH);
 
         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        list.setFont(list.getFont().deriveFont(Font.PLAIN, 15f));
+        list.setFixedCellHeight(38);
         list.setCellRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList<?> l, Object value, int index,
@@ -51,6 +58,7 @@ public class EditorPanel extends JPanel {
                 JLabel label = (JLabel) super.getListCellRendererComponent(l, value, index, selected, focus);
                 label.putClientProperty("html.disable", Boolean.TRUE); // show user text literally
                 label.setText((index + 1) + ". " + ((Card) value).getQuestion());
+                label.setBorder(BorderFactory.createEmptyBorder(4, 10, 4, 10));
                 return label;
             }
         });
@@ -61,9 +69,12 @@ public class EditorPanel extends JPanel {
                 answerField.setText(selected.getAnswer());
             }
         });
-        add(new JScrollPane(list), BorderLayout.CENTER);
+        content.add(new JScrollPane(list), BorderLayout.CENTER);
 
-        add(buildForm(), BorderLayout.SOUTH);
+        content.add(buildForm(), BorderLayout.SOUTH);
+
+        add(new MaxWidthPanel(content, 800), BorderLayout.CENTER);
+
         reloadList();
     }
 
@@ -73,18 +84,47 @@ public class EditorPanel extends JPanel {
         back.addActionListener(e -> navigator.showDeckList());
         JLabel title = new JLabel("Editing: " + deck.getName(), SwingConstants.CENTER);
         title.putClientProperty("html.disable", Boolean.TRUE);
-        title.setFont(title.getFont().deriveFont(Font.BOLD, 20f));
+        title.setFont(title.getFont().deriveFont(Font.BOLD, 22f));
         header.add(back, BorderLayout.WEST);
         header.add(title, BorderLayout.CENTER);
+        header.add(Box.createHorizontalStrut(back.getPreferredSize().width), BorderLayout.EAST);
         return header;
     }
 
     private JPanel buildForm() {
-        JPanel fields = new JPanel(new GridLayout(2, 2, 8, 8));
-        fields.add(new JLabel("Question:"));
-        fields.add(questionField);
-        fields.add(new JLabel("Answer:"));
-        fields.add(answerField);
+        JPanel fields = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(6, 6, 6, 6);
+
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.LINE_START;
+        gbc.weightx = 0;
+        JLabel qLabel = new JLabel("Question:");
+        qLabel.setFont(qLabel.getFont().deriveFont(Font.BOLD, 14f));
+        fields.add(qLabel, gbc);
+
+        gbc.gridx = 1;
+        gbc.gridy = 0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.weightx = 1.0;
+        questionField.setFont(questionField.getFont().deriveFont(Font.PLAIN, 15f));
+        fields.add(questionField, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.weightx = 0;
+        JLabel aLabel = new JLabel("Answer:");
+        aLabel.setFont(aLabel.getFont().deriveFont(Font.BOLD, 14f));
+        fields.add(aLabel, gbc);
+
+        gbc.gridx = 1;
+        gbc.gridy = 1;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.weightx = 1.0;
+        answerField.setFont(answerField.getFont().deriveFont(Font.PLAIN, 15f));
+        fields.add(answerField, gbc);
 
         JButton addButton = new JButton("Add card");
         JButton updateButton = new JButton("Update selected");
@@ -93,12 +133,14 @@ public class EditorPanel extends JPanel {
         updateButton.addActionListener(e -> updateCard());
         deleteButton.addActionListener(e -> deleteCard());
 
-        JPanel buttons = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 0));
-        buttons.add(addButton);
-        buttons.add(updateButton);
-        buttons.add(deleteButton);
+        JPanel buttons = new JPanel(new FlowLayout(FlowLayout.CENTER, 12, 0));
+        for (JButton b : new JButton[] {addButton, updateButton, deleteButton}) {
+            b.setFont(b.getFont().deriveFont(Font.PLAIN, 14f));
+            b.setMargin(new Insets(8, 16, 8, 16));
+            buttons.add(b);
+        }
 
-        JPanel form = new JPanel(new BorderLayout(0, 10));
+        JPanel form = new JPanel(new BorderLayout(0, 12));
         form.add(fields, BorderLayout.CENTER);
         form.add(buttons, BorderLayout.SOUTH);
         return form;
