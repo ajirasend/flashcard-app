@@ -10,7 +10,16 @@ A desktop flashcard quiz app built with pure Java (Swing). Create decks, flip ca
 - [x] Score summary at the end of a quiz
 - [x] Decks saved automatically to `~/.flashcard-app/decks`
 - [x] Cards are shuffled each quiz
-- [ ] Keyboard shortcuts
+- [x] Keyboard shortcuts
+- [x] Modern look with [FlatLaf](https://www.formdev.com/flatlaf/)
+
+## Keyboard shortcuts (quiz)
+| Key | Action |
+|-----|--------|
+| `Space` | Flip the card |
+| `→` | I knew it |
+| `←` | I didn't |
+| `Esc` | Back to the deck list |
 
 ## Requirements
 - Java 25 (JDK)

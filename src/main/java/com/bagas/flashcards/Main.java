@@ -1,5 +1,7 @@
 package com.bagas.flashcards;
 
+import com.formdev.flatlaf.FlatLightLaf;
+
 import com.bagas.flashcards.model.Card;
 import com.bagas.flashcards.model.Deck;
 import com.bagas.flashcards.storage.DeckRepository;
@@ -16,6 +18,9 @@ public class Main {
         Path decksFolder = Path.of(System.getProperty("user.home"), ".flashcard-app", "decks");
         DeckRepository repository = new DeckRepository(decksFolder);
         seedSampleDeckIfEmpty(repository);
+
+        // Must run before any Swing component is created
+        FlatLightLaf.setup();
 
         // Swing UI must be created on the Event Dispatch Thread
         SwingUtilities.invokeLater(() -> new MainFrame(repository).setVisible(true));
