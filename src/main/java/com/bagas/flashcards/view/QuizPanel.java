@@ -10,14 +10,17 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.event.ActionEvent;
 import java.util.Random;
 
+import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 
 /**
@@ -37,9 +40,9 @@ public class QuizPanel extends JPanel {
     private final JLabel progressLabel = new JLabel("", SwingConstants.CENTER);
     private final JLabel sideLabel = new JLabel("", SwingConstants.CENTER);
     private final JLabel cardText = new JLabel("", SwingConstants.CENTER);
-    private final JButton flipButton = new JButton("Flip");
-    private final JButton knewButton = new JButton("I knew it");
-    private final JButton missedButton = new JButton("I didn't");
+    private final JButton flipButton = new JButton("Flip (Space)");
+    private final JButton knewButton = new JButton("I knew it (\u2192)");
+    private final JButton missedButton = new JButton("I didn't (\u2190)");
     private final JLabel scoreLabel = new JLabel("", SwingConstants.CENTER);
 
     /**
@@ -51,7 +54,48 @@ public class QuizPanel extends JPanel {
         setLayout(views);
         add(buildQuizView(), QUIZ_VIEW);
         add(buildResultView(), RESULT_VIEW);
+        installShortcuts();
         startQuiz();
+    }
+
+    /**
+     * Space = flip, left arrow = "I didn't", right arrow = "I knew it", Escape = back.
+     * Bound to the whole window so they work no matter which component has focus.
+     */
+    private void installShortcuts() {
+        // Buttons must not steal focus, otherwise Space would "click" whichever button was last used
+        flipButton.setFocusable(false);
+        knewButton.setFocusable(false);
+        missedButton.setFocusable(false);
+
+        bindKey("SPACE", "flip", this::flipIfAllowed);
+        bindKey("RIGHT", "knew", () -> gradeIfAllowed(true));
+        bindKey("LEFT", "missed", () -> gradeIfAllowed(false));
+        bindKey("ESCAPE", "back", onExit);
+    }
+
+    private void bindKey(String keyStroke, String name, Runnable action) {
+        getInputMap(WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(keyStroke), name);
+        getActionMap().put(name, new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                action.run();
+            }
+        });
+    }
+
+    // Shortcuts must follow the same rules as the buttons: no flipping or grading on the score screen,
+    // and no grading before the answer has been seen.
+    private void flipIfAllowed() {
+        if (!session.isFinished() && flipButton.isEnabled()) {
+            flip();
+        }
+    }
+
+    private void gradeIfAllowed(boolean knewIt) {
+        if (!session.isFinished() && showingAnswer) {
+            grade(knewIt);
+        }
     }
 
     private JPanel buildQuizView() {
