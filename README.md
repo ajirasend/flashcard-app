@@ -17,7 +17,7 @@ A desktop flashcard quiz app built with pure Java (Swing). Create decks, flip ca
 
 ## Build and run
 ```bash
-git clone https://github.com/<your-username>/flashcard-app.git
+git clone https://github.com/ajirasend/flashcard-app.git
 cd flashcard-app
 mvn test
 mvn package
