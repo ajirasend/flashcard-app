@@ -8,7 +8,7 @@ A desktop flashcard quiz app built with pure Java (Swing). Create decks, flip ca
 - [ ] Create, edit and delete decks and cards
 - [ ] Flip cards and self-grade ("I knew it" / "I didn't")
 - [ ] Score summary at the end of a quiz
-- [ ] Decks saved to a local file
+- [x] Decks saved to a local file
 - [ ] Shuffle mode and keyboard shortcuts
 
 ## Requirements
